@@ -1,0 +1,101 @@
+--Crear tabla tipo de vendedor
+CREATE TABLE IF NOT EXISTS seller_kind (
+	seller_kind_code SERIAL PRIMARY KEY,
+	seller_kind_name VARCHAR (20)
+);
+
+--Crear tabla vendedor
+CREATE TABLE IF NOT EXISTS sellers (
+	seller_INE VARCHAR (15) PRIMARY KEY,
+	seller_name VARCHAR (30) NOT NULL,
+	seller_address VARCHAR (30) NOT NULL,
+	seller_kind_code INT NOT NULL,
+	seller_sale INT NOT NULL,
+	FOREIGN KEY (seller_kind_code) REFERENCES seller_kind (seller_kind_code)
+);
+
+--Crear tabla datos tecnicos del vehiculo
+CREATE TABLE IF NOT EXISTS technical_date (
+	technical_data_id SERIAL PRIMARY KEY,
+	maximum_speed INT NOT NULL,
+	fuel_type VARCHAR(20) NOT NULL,
+	consumption_fuel INT NOT NULL,
+	passenger_capacity INT NOT NULL
+);
+
+--Crear tabla marca
+CREATE TABLE IF NOT EXISTS brands_cars(
+	brand_car_id SERIAL PRIMARY KEY,
+	brand_car_name VARCHAR (20) NOT NULL
+);
+
+--Crear tabla tipo de equipamiento
+CREATE TABLE IF NOT EXISTS equipment_kind(
+	equipment_kind_id SERIAL PRIMARY KEY,
+	equipment_kind_name VARCHAR (40) NOT NULL
+);
+
+--Crear tabla detalles equipamiento
+CREATE TABLE IF NOT EXISTS equipment_datails (
+	equipmet_dateail_id SERIAL PRIMARY KEY,
+	equipmet_dateail_name VARCHAR (40) NOT NULL,
+	equipmet_dateail_price INT NOT NULL,
+	equipment_kind_id INT NOT NULL,
+	FOREIGN KEY (equipment_kind_id) REFERENCES equipment_kind (equipment_kind_id)
+);
+
+--Crear tabla de equipamiento del vehiculo
+CREATE TABLE IF NOT EXISTS equipment_car(
+	equipment_car_id SERIAL PRIMARY KEY,
+	equipmet_dateail_id INT NOT NULL,
+	FOREIGN KEY (equipmet_dateail_id) REFERENCES equipment_datails (equipmet_dateail_id)
+);
+
+--Crear tabla modelo
+CREATE TABLE IF NOT EXISTS model_car (
+	model_car_id SERIAL PRIMARY KEY,
+	model_car_name VARCHAR(20) NOT NULL,
+	brand_car_id INT NOT NULL,
+	equipment_car_id INT NOT NULL,
+	FOREIGN KEY (brand_car_id) REFERENCES brands_cars (brand_car_id),
+	FOREIGN KEY (equipment_car_id) REFERENCES equipment_car (equipment_car_id)
+);
+
+--Crear tabla STOCK
+CREATE TABLE IF NOT EXISTS stock_car(
+	stock_car_id SERIAL PRIMARY KEY,
+	stock_car_lot INT NOT NULL
+);
+
+--Crear tabla vehiculo
+CREATE TABLE IF NOT EXISTS cars (
+	car_register SERIAL PRIMARY KEY,
+	model_car_id INT NOT NULL,
+	car_discount NUMERIC(10,2) NOT NULL,
+	technical_data_id INT NOT NULL,
+	stock_car_id INT,
+	FOREIGN KEY (technical_data_id) REFERENCES technical_date (technical_data_id),
+	FOREIGN KEY (model_car_id) REFERENCES model_car (model_car_id),
+	FOREIGN KEY (stock_car_id) REFERENCES stock_car (stock_car_id)
+);
+
+--Crear tabla detalle venta
+CREATE TABLE IF NOT EXISTS details_sales (
+	details_sales_id SERIAL PRIMARY KEY,
+	car_register INT NOT NULL,
+	details_sales_price NUMERIC(10,2) NOT NULL,
+	extra VARCHAR (20) NOT NULL,
+	extra_price NUMERIC (10,2) NOT NULL,
+	FOREIGN KEY (car_register) REFERENCES cars (car_register)
+);
+
+--Crear tabla venta
+CREATE TABLE IF NOT EXISTS sales(
+	sales_id SERIAL PRIMARY KEY,
+	payment_type VARCHAR(10) NOT NULL,
+	details_sales_id INT NOT NULL,
+	seller_INE VARCHAR(15) NOT NULL,
+	sale_date DATE NOT NULL,
+	FOREIGN KEY (details_sales_id) REFERENCES details_sales (details_sales_id),
+	FOREIGN KEY (seller_INE) REFERENCES sellers (seller_INE)
+);
